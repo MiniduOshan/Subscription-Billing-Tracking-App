@@ -1,90 +1,108 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       body: Container(
         width: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF0E5AE8), Color(0xFF27A7FF), Color(0xFFEFF6FF)],
-            stops: [0.0, 0.45, 1.0],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              theme.colorScheme.primary,
+              const Color(0xFF4F46E5),
+              const Color(0xFF312E81),
+            ],
           ),
         ),
         child: Stack(
           children: [
             Positioned(
-              top: -80,
-              right: -50,
-              child: Container(
-                height: 220,
-                width: 220,
-                decoration: BoxDecoration(
-                  color: Colors.white.withAlpha(40),
-                  shape: BoxShape.circle,
-                ),
-              ),
+              top: -100,
+              right: -100,
+              child: _CircularGlass(size: 300, opacity: 0.1),
             ),
             Positioned(
               bottom: -50,
-              left: -30,
-              child: Container(
-                height: 180,
-                width: 180,
-                decoration: BoxDecoration(
-                  color: Colors.white.withAlpha(35),
-                  shape: BoxShape.circle,
-                ),
-              ),
+              left: -50,
+              child: _CircularGlass(size: 200, opacity: 0.15),
             ),
             Center(
-              child: Container(
-                margin: const EdgeInsets.all(24),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 26,
-                  vertical: 28,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withAlpha(225),
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x330F172A),
-                      blurRadius: 24,
-                      offset: Offset(0, 14),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(32),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withAlpha(40),
+                          blurRadius: 30,
+                          offset: const Offset(0, 15),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: const Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
+                    child: Icon(
                       Icons.account_balance_wallet_rounded,
-                      size: 72,
-                      color: Color(0xFF0E5AE8),
+                      size: 64,
+                      color: theme.colorScheme.primary,
                     ),
-                    SizedBox(height: 12),
-                    Text(
-                      'Subscription Billing Tracker',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w800,
-                      ),
+                  ),
+                  const SizedBox(height: 32),
+                  Text(
+                    'SubTrack',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 40,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      letterSpacing: -1,
                     ),
-                    SizedBox(height: 8),
-                    Text('Plan. Pay. Track. Repeat.'),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Manage subscriptions with ease',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white.withAlpha(180),
+                    ),
+                  ),
+                  const SizedBox(height: 48),
+                  const CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    strokeWidth: 3,
+                  ),
+                ],
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _CircularGlass extends StatelessWidget {
+  final double size;
+  final double opacity;
+  const _CircularGlass({required this.size, required this.opacity});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: Colors.white.withAlpha((opacity * 255).toInt()),
+        shape: BoxShape.circle,
       ),
     );
   }

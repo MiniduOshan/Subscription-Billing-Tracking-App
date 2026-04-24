@@ -1,89 +1,124 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   static ThemeData get lightTheme {
-    const surface = Color(0xFFF4F7FF);
+    const surface = Color(0xFFF8FAFC);
     const card = Color(0xFFFFFFFF);
-    const primary = Color(0xFF0E5AE8);
-    const secondary = Color(0xFF00A6A6);
-    const tertiary = Color(0xFFFF7A18);
+    const primary = Color(0xFF6366F1); // Modern Indigo
+    const secondary = Color(0xFF10B981); // Emerald
+    const tertiary = Color(0xFFF59E0B); // Amber
+    const error = Color(0xFFEF4444); // Red
+
+    final baseTextTheme = GoogleFonts.plusJakartaSansTextTheme();
 
     return ThemeData(
       useMaterial3: true,
       scaffoldBackgroundColor: surface,
-      colorScheme: const ColorScheme.light(
+      colorScheme: ColorScheme.light(
         primary: primary,
         secondary: secondary,
         tertiary: tertiary,
+        error: error,
         surface: surface,
-        onSurface: Color(0xFF1F2937),
+        onSurface: const Color(0xFF0F172A),
+        primaryContainer: primary.withAlpha(20),
+        secondaryContainer: secondary.withAlpha(20),
+      ),
+      textTheme: baseTextTheme.copyWith(
+        displayLarge: baseTextTheme.displayLarge?.copyWith(
+          fontWeight: FontWeight.w800,
+          color: const Color(0xFF0F172A),
+        ),
+        headlineMedium: baseTextTheme.headlineMedium?.copyWith(
+          fontWeight: FontWeight.w700,
+          color: const Color(0xFF0F172A),
+        ),
+        titleLarge: baseTextTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.w700,
+          color: const Color(0xFF0F172A),
+        ),
+        titleMedium: baseTextTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.w600,
+          color: const Color(0xFF0F172A),
+        ),
       ),
       appBarTheme: AppBarTheme(
         centerTitle: false,
-        backgroundColor: Colors.white.withAlpha(240),
-        foregroundColor: Color(0xFF1F2937),
+        backgroundColor: surface.withAlpha(200),
+        foregroundColor: const Color(0xFF0F172A),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
+        titleTextStyle: GoogleFonts.plusJakartaSans(
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+          color: const Color(0xFF0F172A),
+        ),
       ),
       cardTheme: CardThemeData(
         color: card,
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        shadowColor: const Color(0x1A0F172A),
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: BorderSide(color: Colors.black.withAlpha(12), width: 1),
+        ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: const Color(0xFFFDFEFF),
+        fillColor: Colors.white,
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 14,
+          horizontal: 20,
+          vertical: 16,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: Colors.black.withAlpha(20)),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: Colors.black.withAlpha(20)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: primary, width: 1.5),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: primary, width: 2),
         ),
-      ),
-      chipTheme: const ChipThemeData(
-        shape: StadiumBorder(),
-        side: BorderSide.none,
+        hintStyle: TextStyle(color: Colors.black.withAlpha(100)),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: primary,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          elevation: 0,
         ),
-      ),
-      floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: primary,
-        foregroundColor: Colors.white,
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: Colors.white,
-        indicatorColor: primary.withAlpha(30),
-        labelTextStyle: WidgetStateProperty.all(
-          const TextStyle(fontWeight: FontWeight.w600),
-        ),
-      ),
-      navigationRailTheme: NavigationRailThemeData(
-        backgroundColor: Colors.white.withAlpha(245),
-        indicatorColor: primary.withAlpha(30),
-        selectedIconTheme: const IconThemeData(color: primary),
-        selectedLabelTextStyle: const TextStyle(
-          color: primary,
-          fontWeight: FontWeight.w700,
-        ),
+        elevation: 10,
+        indicatorColor: primary.withAlpha(20),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const IconThemeData(color: primary, size: 28);
+          }
+          return IconThemeData(color: Colors.black.withAlpha(100));
+        }),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return GoogleFonts.plusJakartaSans(
+              color: primary,
+              fontWeight: FontWeight.w700,
+              fontSize: 12,
+            );
+          }
+          return GoogleFonts.plusJakartaSans(
+            color: Colors.black.withAlpha(100),
+            fontWeight: FontWeight.w500,
+            fontSize: 12,
+          );
+        }),
       ),
     );
   }

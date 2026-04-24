@@ -153,45 +153,32 @@ class _SubscriptionBillingAppState extends State<SubscriptionBillingApp> {
                     },
                   ),
                 ),
-          body: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFFF5F9FF),
-                  Color(0xFFF7FCFF),
-                  Color(0xFFFFF8EE),
-                ],
-              ),
-            ),
-            child: Row(
-              children: [
-                if (isDesktop)
-                  NavigationRail(
-                    selectedIndex: _selectedIndex,
-                    onDestinationSelected: (index) {
-                      if (!_isAdmin && _destinations[index].label == 'Admin') {
-                        return;
-                      }
-                      setState(() {
-                        _selectedIndex = index;
-                      });
-                    },
-                    extended: constraints.maxWidth > 1300,
-                    destinations: _destinations
-                        .map(
-                          (d) => NavigationRailDestination(
-                            icon: Icon(d.icon),
-                            selectedIcon: Icon(d.selectedIcon),
-                            label: Text(d.label),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                Expanded(child: page),
-              ],
-            ),
+          body: Row(
+            children: [
+              if (isDesktop)
+                NavigationRail(
+                  selectedIndex: _selectedIndex,
+                  onDestinationSelected: (index) {
+                    if (!_isAdmin && _destinations[index].label == 'Admin') {
+                      return;
+                    }
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  },
+                  extended: constraints.maxWidth > 1300,
+                  destinations: _destinations
+                      .map(
+                        (d) => NavigationRailDestination(
+                          icon: Icon(d.icon),
+                          selectedIcon: Icon(d.selectedIcon),
+                          label: Text(d.label),
+                        ),
+                      )
+                      .toList(),
+                ),
+              Expanded(child: page),
+            ],
           ),
           bottomNavigationBar: isDesktop
               ? null
