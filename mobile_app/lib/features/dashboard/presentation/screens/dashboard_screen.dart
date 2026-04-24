@@ -12,68 +12,113 @@ class DashboardScreen extends StatelessWidget {
     final upcomingTotal = DummyData.upcomingPaymentsTotal;
     final activeCount = DummyData.subscriptions.length;
 
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      children: [
-        _buildHeader(context, totalMonthly),
-        const SizedBox(height: 24),
-        Text(
-          'Overview',
-          style: theme.textTheme.titleLarge,
-        ),
-        const SizedBox(height: 16),
-        GridView.count(
-          crossAxisCount: 2,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 16,
-          childAspectRatio: 1.1,
-          children: [
-            _MetricCard(
-              title: 'Active Subs',
-              value: activeCount.toString(),
-              color: theme.colorScheme.primary,
-              icon: Icons.subscriptions_rounded,
+    return LayoutBuilder(builder: (context, constraints) {
+      final isWide = constraints.maxWidth > 800;
+
+      return ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+        children: [
+          if (isWide)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: _buildHeader(context, totalMonthly),
+                ),
+                const SizedBox(width: 24),
+                Expanded(
+                  flex: 2,
+                  child: _MetricCard(
+                    title: 'Next 7 Days',
+                    value: '\$${upcomingTotal.toStringAsFixed(2)}',
+                    color: theme.colorScheme.tertiary,
+                    icon: Icons.event_repeat_rounded,
+                  ),
+                ),
+              ],
+            )
+          else
+            Column(
+              children: [
+                _buildHeader(context, totalMonthly),
+                const SizedBox(height: 16),
+                _MetricCard(
+                  title: 'Next 7 Days',
+                  value: '\$${upcomingTotal.toStringAsFixed(2)}',
+                  color: theme.colorScheme.tertiary,
+                  icon: Icons.event_repeat_rounded,
+                ),
+              ],
             ),
-            _MetricCard(
-              title: 'Next 7 Days',
-              value: '\$${upcomingTotal.toStringAsFixed(2)}',
-              color: theme.colorScheme.tertiary,
-              icon: Icons.event_repeat_rounded,
-            ),
-            _MetricCard(
-              title: 'Categories',
-              value: SubscriptionCategory.values.length.toString(),
-              color: theme.colorScheme.secondary,
-              icon: Icons.category_rounded,
-            ),
-            _MetricCard(
-              title: 'Avg. Monthly',
-              value: '\$${(totalMonthly / 12).toStringAsFixed(2)}',
-              color: const Color(0xFF8B5CF6),
-              icon: Icons.analytics_rounded,
-            ),
-          ],
-        ),
-        const SizedBox(height: 24),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Upcoming Payments',
-              style: theme.textTheme.titleLarge,
-            ),
-            TextButton(
-              onPressed: () {},
-              child: const Text('See All'),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        ...DummyData.subscriptions.take(3).map((sub) => _UpcomingPaymentTile(sub: sub)),
-      ],
-    );
+          const SizedBox(height: 32),
+          Text(
+            'Overview',
+            style: theme.textTheme.titleLarge,
+          ),
+          const SizedBox(height: 16),
+          GridView.count(
+            crossAxisCount: isWide ? 3 : 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: 16,
+            crossAxisSpacing: 16,
+            childAspectRatio: isWide ? 2.5 : 1.1,
+            children: [
+              _MetricCard(
+                title: 'Active Subs',
+                value: activeCount.toString(),
+                color: theme.colorScheme.primary,
+                icon: Icons.subscriptions_rounded,
+              ),
+              _MetricCard(
+                title: 'Categories',
+                value: SubscriptionCategory.values.length.toString(),
+                color: theme.colorScheme.secondary,
+                icon: Icons.category_rounded,
+              ),
+              _MetricCard(
+                title: 'Avg. Monthly',
+                value: '\$${(totalMonthly / 12).toStringAsFixed(2)}',
+                color: const Color(0xFF8B5CF6),
+                icon: Icons.analytics_rounded,
+              ),
+            ],
+          ),
+          const SizedBox(height: 32),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Upcoming Payments',
+                style: theme.textTheme.titleLarge,
+              ),
+              TextButton(
+                onPressed: () {},
+                child: const Text('See All'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (isWide)
+            Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              children: DummyData.subscriptions
+                  .take(4)
+                  .map((sub) => SizedBox(
+                        width: (constraints.maxWidth - 48 - 16) / 2,
+                        child: _UpcomingPaymentTile(sub: sub),
+                      ))
+                  .toList(),
+            )
+          else
+            ...DummyData.subscriptions
+                .take(3)
+                .map((sub) => _UpcomingPaymentTile(sub: sub)),
+        ],
+      );
+    });
   }
 
   Widget _buildHeader(BuildContext context, double total) {

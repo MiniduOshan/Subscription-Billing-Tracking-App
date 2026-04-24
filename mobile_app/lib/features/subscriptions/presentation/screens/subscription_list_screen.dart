@@ -19,61 +19,88 @@ class SubscriptionListScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Search subscriptions',
-                      prefixIcon: const Icon(Icons.search_rounded, size: 22),
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.black.withAlpha(10)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.black.withAlpha(10)),
+      body: LayoutBuilder(builder: (context, constraints) {
+        final isWide = constraints.maxWidth > 800;
+
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Search subscriptions',
+                        prefixIcon: const Icon(Icons.search_rounded, size: 22),
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide:
+                              BorderSide(color: Colors.black.withAlpha(10)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide:
+                              BorderSide(color: Colors.black.withAlpha(10)),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Container(
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withAlpha(20),
-                    borderRadius: BorderRadius.circular(16),
+                  const SizedBox(width: 12),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withAlpha(20),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: IconButton(
+                      onPressed: () {},
+                      icon: Icon(Icons.tune_rounded,
+                          color: theme.colorScheme.primary),
+                    ),
                   ),
-                  child: IconButton(
-                    onPressed: () {},
-                    icon: Icon(Icons.tune_rounded, color: theme.colorScheme.primary),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              itemCount: subs.length,
-              itemBuilder: (context, index) {
-                final sub = subs[index];
-                return _SubscriptionCard(
-                  sub: sub,
-                  onTap: onOpenDetails,
-                  onEdit: onOpenEdit,
-                );
-              },
+            const SizedBox(height: 16),
+            Expanded(
+              child: isWide
+                  ? GridView.builder(
+                      padding: const EdgeInsets.all(24),
+                      gridDelegate:
+                          const SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: 400,
+                        mainAxisExtent: 180,
+                        crossAxisSpacing: 20,
+                        mainAxisSpacing: 20,
+                      ),
+                      itemCount: subs.length,
+                      itemBuilder: (context, index) {
+                        final sub = subs[index];
+                        return _SubscriptionCard(
+                          sub: sub,
+                          onTap: onOpenDetails,
+                          onEdit: onOpenEdit,
+                        );
+                      },
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      itemCount: subs.length,
+                      itemBuilder: (context, index) {
+                        final sub = subs[index];
+                        return _SubscriptionCard(
+                          sub: sub,
+                          onTap: onOpenDetails,
+                          onEdit: onOpenEdit,
+                        );
+                      },
+                    ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      }),
     );
   }
 }

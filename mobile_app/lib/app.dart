@@ -111,26 +111,29 @@ class _SubscriptionBillingAppState extends State<SubscriptionBillingApp> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isDesktop = constraints.maxWidth >= 1000;
+        final isDesktop = constraints.maxWidth >= 1024;
+        final isTablet = constraints.maxWidth >= 768 && constraints.maxWidth < 1024;
         final page = _buildPage(_selectedIndex);
 
         return Scaffold(
-          appBar: AppBar(
-            title: Text(_destinations[_selectedIndex].label),
-            actions: [
-              IconButton(
-                tooltip: 'Logout',
-                onPressed: () {
-                  setState(() {
-                    _isAuthenticated = false;
-                    _selectedIndex = 0;
-                  });
-                },
-                icon: const Icon(Icons.logout),
-              ),
-            ],
-          ),
-          drawer: isDesktop
+          appBar: isDesktop
+              ? null
+              : AppBar(
+                  title: Text(_destinations[_selectedIndex].label),
+                  actions: [
+                    IconButton(
+                      tooltip: 'Logout',
+                      onPressed: () {
+                        setState(() {
+                          _isAuthenticated = false;
+                          _selectedIndex = 0;
+                        });
+                      },
+                      icon: const Icon(Icons.logout),
+                    ),
+                  ],
+                ),
+          drawer: (isDesktop || isTablet)
               ? null
               : Drawer(
                   child: ListView.builder(
@@ -155,8 +158,8 @@ class _SubscriptionBillingAppState extends State<SubscriptionBillingApp> {
                 ),
           body: Row(
             children: [
-              if (isDesktop)
-                NavigationRail(
+              if (isDesktop || isTablet)
+                _WebSidebar(
                   selectedIndex: _selectedIndex,
                   onDestinationSelected: (index) {
                     if (!_isAdmin && _destinations[index].label == 'Admin') {
@@ -166,21 +169,28 @@ class _SubscriptionBillingAppState extends State<SubscriptionBillingApp> {
                       _selectedIndex = index;
                     });
                   },
-                  extended: constraints.maxWidth > 1300,
-                  destinations: _destinations
-                      .map(
-                        (d) => NavigationRailDestination(
-                          icon: Icon(d.icon),
-                          selectedIcon: Icon(d.selectedIcon),
-                          label: Text(d.label),
-                        ),
-                      )
-                      .toList(),
+                  onLogout: () {
+                    setState(() {
+                      _isAuthenticated = false;
+                      _selectedIndex = 0;
+                    });
+                  },
+                  destinations: _destinations,
+                  extended: isDesktop,
                 ),
-              Expanded(child: page),
+              Expanded(
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: isDesktop ? 1200 : double.infinity,
+                    ),
+                    child: page,
+                  ),
+                ),
+              ),
             ],
           ),
-          bottomNavigationBar: isDesktop
+          bottomNavigationBar: (isDesktop || isTablet)
               ? null
               : NavigationBar(
                   selectedIndex: _selectedIndex > 3 ? 0 : _selectedIndex,
@@ -263,4 +273,169 @@ class _AppDestination {
   final String label;
   final IconData icon;
   final IconData selectedIcon;
+}
+
+class _WebSidebar extends StatelessWidget {
+  const _WebSidebar({
+    required this.selectedIndex,
+    required this.onDestinationSelected,
+    required this.destinations,
+    required this.onLogout,
+    this.extended = true,
+  });
+
+  final int selectedIndex;
+  final ValueChanged<int> onDestinationSelected;
+  final List<_AppDestination> destinations;
+  final VoidCallback onLogout;
+  final bool extended;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      width: extended ? 280 : 80,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          right: BorderSide(
+            color: theme.colorScheme.onSurface.withOpacity(0.08),
+            width: 1,
+          ),
+        ),
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+            child: Row(
+              mainAxisAlignment:
+                  extended ? MainAxisAlignment.start : MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.account_balance_wallet_rounded,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+                if (extended) ...[
+                  const SizedBox(width: 12),
+                  const Text(
+                    'BillTracker',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              itemCount: destinations.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 4),
+              itemBuilder: (context, index) {
+                final d = destinations[index];
+                final isSelected = selectedIndex == index;
+
+                return InkWell(
+                  onTap: () => onDestinationSelected(index),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 12,
+                      horizontal: extended ? 16 : 0,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? theme.colorScheme.primaryContainer
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: extended
+                          ? MainAxisAlignment.start
+                          : MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          isSelected ? d.selectedIcon : d.icon,
+                          color: isSelected
+                              ? theme.colorScheme.primary
+                              : theme.colorScheme.onSurface.withOpacity(0.6),
+                          size: 22,
+                        ),
+                        if (extended) ...[
+                          const SizedBox(width: 16),
+                          Text(
+                            d.label,
+                            style: TextStyle(
+                              color: isSelected
+                                  ? theme.colorScheme.primary
+                                  : theme.colorScheme.onSurface.withOpacity(0.7),
+                              fontWeight:
+                                  isSelected ? FontWeight.bold : FontWeight.w500,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: InkWell(
+              onTap: onLogout,
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: extended ? 16 : 0,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisAlignment:
+                      extended ? MainAxisAlignment.start : MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.logout_rounded,
+                      color: theme.colorScheme.error.withOpacity(0.8),
+                      size: 22,
+                    ),
+                    if (extended) ...[
+                      const SizedBox(width: 16),
+                      Text(
+                        'Logout',
+                        style: TextStyle(
+                          color: theme.colorScheme.error.withAlpha(200),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
